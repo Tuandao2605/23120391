@@ -11,66 +11,57 @@ pipeline {
 
     stages {
 
-        stage('0. Prepare Workspace') {
+        stage('Prepare Workspace') {
             steps {
                 cleanWs()
-                echo 'Workspace cleaned!'
-            }
-        }
-
-        stage('1. Fetch Source Code') {
-            steps {
                 checkout scm
-                echo 'Repository fetched from GitHub'
             }
         }
 
-        stage('2. Build & Publish Image') {
+        stage('Build & Push Image') {
             steps {
-                script {
-                    docker.withRegistry('', DOCKER_CREDENTIAL) {
-                        echo 'Start building Docker image...'
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: DOCKER_CREDENTIAL,
+                        usernameVariable: 'holycore1',
+                        passwordVariable: 'tuan2652005'
+                    )
+                ]) {
+                    sh '''
+                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
-                        def image = docker.build(
-                            "${DOCKER_USER}/${APP_IMAGE}:${env.BUILD_ID}"
-                        )
+                    docker build -t $DOCKER_USER/$APP_IMAGE:$BUILD_ID .
+                    docker tag $DOCKER_USER/$APP_IMAGE:$BUILD_ID $DOCKER_USER/$APP_IMAGE:latest
 
-                        echo 'Publishing image to Docker Hub...'
-                        image.push()
-                        image.push('stable')
-                    }
+                    docker push $DOCKER_USER/$APP_IMAGE:$BUILD_ID
+                    docker push $DOCKER_USER/$APP_IMAGE:latest
+                    '''
                 }
             }
         }
 
-        stage('3. Deploy Application') {
+        stage('Deploy Application') {
             steps {
                 sh '''
-                echo "Deploying new container version..."
-
-                docker stop ${APP_CONTAINER} || true
-                docker rm ${APP_CONTAINER} || true
+                docker stop $APP_CONTAINER || true
+                docker rm $APP_CONTAINER || true
 
                 docker run -d \
                 --restart unless-stopped \
-                -p ${PUBLIC_PORT}:3000 \
-                --name ${APP_CONTAINER} \
-                ${DOCKER_USER}/${APP_IMAGE}:stable
+                -p $PUBLIC_PORT:3000 \
+                --name $APP_CONTAINER \
+                $DOCKER_USER/$APP_IMAGE:latest
                 '''
             }
         }
     }
 
     post {
-        always {
-            echo 'Pipeline execution finished.'
-        }
         success {
             echo 'Deployment successful!'
-            echo 'App URL: http://<VM_IP>:8081'
         }
         failure {
-            echo 'Deployment failed. Please check logs.'
+            echo 'Deployment failed!'
         }
     }
 }
