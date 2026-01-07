@@ -1,0 +1,12 @@
+{
+  "name": "23120391",
+  "version": "1.0.0",
+  "description": "Simple NodeJS app for CI/CD with Jenkins and Docker",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
