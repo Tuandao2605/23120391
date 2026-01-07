@@ -23,8 +23,8 @@ pipeline {
                 withCredentials([
                     usernamePassword(
                         credentialsId: DOCKER_CREDENTIAL,
-                        usernameVariable: 'holycore1',
-                        passwordVariable: 'tuan2652005'
+                        usernameVariable: 'DOCKER_USERNAME',
+                        passwordVariable: 'DOCKER_PASSWORD'
                     )
                 ]) {
                     sh '''
