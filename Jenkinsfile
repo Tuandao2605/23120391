@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    triggers {
+        githubPush()
+    }
+    
     environment {
         DOCKER_USER = 'holycore1'
         APP_IMAGE = 'app-23120391'
