@@ -24,6 +24,15 @@ app.post("/sum", (req, res) => {
   });
 });
 
+// Request 4 (NEW)
+app.get("/info", (req, res) => {
+  res.json({
+    app: "NodeJS CI/CD Demo",
+    version: "1.0.0",
+    serverTime: new Date().toISOString()
+  });
+});
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
