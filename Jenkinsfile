@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        DOCKER_USER = '23120391'
+        DOCKER_USER = 'holycore1'
         APP_IMAGE = 'app-23120391'
         APP_CONTAINER = 'container-2312091'
         DOCKER_CREDENTIAL = 'dockerhub-id'
